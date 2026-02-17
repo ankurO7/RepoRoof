@@ -1,7 +1,7 @@
 import os
 import git
 from textual.app import App, ComposeResult
-import textual.widgets import Header, Footer, Static, Label, ListItem, ListView
+from textual.widgets import Header, Footer, Static, Label, ListItem, ListView
 from textual.containers import Container, Vertical, Horizontal
 from textual.screen import Screen
 
@@ -9,7 +9,8 @@ from textual.screen import Screen
 
 class BranchRoom(Screen):
 
-    # Inside of a branch window
+    BINDINGS = [("escape", "back_to_building", "Exit Room")]
+
     def __init__(self, branch_name):
         super().__init__()
         self.branch_name = branch_name
@@ -17,20 +18,20 @@ class BranchRoom(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         with Vertical(id="room-view"):
-            yield Label(f" Inside Room :  {self.branch_name}", id="room-title")
-            yield Label("Furniture (Files in this branch): ",classes = "subtitle")
-
-            #List files in the current directory as 'Furniture'
-
-            file_list = ListView()
+            yield Label(f"🏠 Inside Room: {self.branch_name}", id="room-title")
             
-            for file in os.listdir('.'):
-                if not file.startswith('.'):
-                    file_list.append(ListItem(Label(f" {file}")))
-            yield file_list
-        
-        yield Label("Press 'ESC' to exit the room", id = "exit-hint")
+            items = [
+                ListItem(Label(f"🪑 {file}")) 
+                for file in os.listdir('.') 
+                if not file.startswith('.')
+            ]
+            yield ListView(*items)
+            
         yield Footer()
+
+    def action_back_to_building(self) -> None:
+        """The action called by the 'escape' binding."""
+        self.app.pop_screen()
 
 
 # Branch Component (Window) ---
@@ -82,7 +83,7 @@ class GitBuilding(App):
         border: heavy $accent;
         margin: 2;
     }
-    #room-title { font-size: 150%; color: $accent; margin-bottom: 1; }
+    #room-title { text-style: bold italic ; color: $accent; margin-bottom: 1; width: 100%; content-align: center middle; }
     #exit-hint { text-align: center; color: $text-muted; }
     """
 
@@ -93,7 +94,7 @@ class GitBuilding(App):
                 repo = git.Repo(os.getcwd())
                 for branch in  repo.branches:
                     is_current = (branch == repo.active_branch)
-                    kclass = "active-branch" if is_current else ""
+                    klass = "active-branch" if is_current else ""
                     yield BranchWindow(branch, is_current, classes=klass)
             except Exception as e:
                 yield Label(f"Error: {e}\nEnsure 'seeMe' is a git init'd folder.")
