@@ -103,7 +103,7 @@ class GitBuilding(App):
     .poster {
         background: $boost;
         color: $secondary;
-        border: left $secondary;
+        border: solid $secondary;
         padding: 0 1;
         margin-bottom: 1;
     }
