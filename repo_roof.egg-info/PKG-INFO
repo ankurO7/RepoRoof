@@ -1,0 +1,21 @@
+Metadata-Version: 2.4
+Name: repo-roof
+Version: 0.1.0
+Summary: A structural TUI for Git visualization
+Author-email: Ankur Kumar <your-email@example.com>
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: textual
+Requires-Dist: gitpython
+
+# RepoRoof 
+## A Structural Terminal UI for Git.
+
+## Quick Start
+1. **Clone the repo** into your project folder.
+2. **Install required libraries**:
+```bash
+pip install -r requirements.txt```
+3. Run the architect:
+```bash python building.py ```
+

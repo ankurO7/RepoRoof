@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "repo-roof"
+version = "0.1.0"
+authors = [
+  { name="Ankur Kumar", email="your-email@example.com" },
+]
+description = "A structural TUI for Git visualization"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "textual",
+    "gitpython",
+]
+
+[project.scripts]
+repo-roof = "building:main"
