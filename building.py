@@ -8,7 +8,6 @@ from textual.screen import Screen
 # Branch Content View
 
 class BranchRoom(Screen):
-
     BINDINGS = [("escape", "back_to_building", "Exit Room")]
 
     def __init__(self, branch_name):
@@ -20,19 +19,31 @@ class BranchRoom(Screen):
         with Vertical(id="room-view"):
             yield Label(f"🏠 Inside Room: {self.branch_name}", id="room-title")
             
-            items = [
-                ListItem(Label(f"🪑 {file}")) 
-                for file in os.listdir('.') 
-                if not file.startswith('.')
-            ]
+            # --- SECTION 1: COMMIT POSTERS ---
+            yield Label("📜 Latest Construction Logs (Commits):", classes="subtitle")
+            repo = git.Repo(os.getcwd(), search_parent_directories=True)
+            
+            # Fetch last 5 commits for THIS branch
+            try:
+                commits = list(repo.iter_commits(self.branch_name, max_count=5))
+                commit_gallery = Vertical(id="commit-gallery")
+                for c in commits:
+                    # Creating a 'Poster' for each commit
+                    date_str = c.committed_datetime.strftime('%Y-%m-%d')
+                    commit_gallery.mount(Static(f"📍 {c.summary} ({date_str})", classes="poster"))
+                yield commit_gallery
+            except Exception:
+                yield Label("No logs found for this room.")
+
+            # --- SECTION 2: FURNITURE ---
+            yield Label("🪑 Furniture (Files):", classes="subtitle")
+            items = [ListItem(Label(f"📄 {file}")) for file in os.listdir('.') if not file.startswith('.')]
             yield ListView(*items)
             
         yield Footer()
 
     def action_back_to_building(self) -> None:
-        """The action called by the 'escape' binding."""
         self.app.pop_screen()
-
 
 # Branch Component (Window) ---
 
@@ -82,6 +93,26 @@ class GitBuilding(App):
         padding: 2;
         border: heavy $accent;
         margin: 2;
+    }
+    .subtitle {
+    text-style: bold;
+    color: $accent;
+    margin-top: 1;
+    }
+
+    .poster {
+        background: $boost;
+        color: $secondary;
+        border: left $secondary;
+        padding: 0 1;
+        margin-bottom: 1;
+    }
+
+    #commit-gallery {
+        height: auto;
+        margin-bottom: 1;
+        border: dashed $secondary;
+        padding: 1;
     }
     #room-title { text-style: bold italic ; color: $accent; margin-bottom: 1; width: 100%; content-align: center middle; }
     #exit-hint { text-align: center; color: $text-muted; }
